@@ -77,16 +77,198 @@ You will need to provide detailed documentation of your API endpoints including 
 
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
+- Returns: An object with success flag, `categories`, that contains an object of `id: category_string` key: value pairs
 
 ```json
 {
+  "success": True,
+  "categories": {
   "1": "Science",
   "2": "Art",
   "3": "Geography",
   "4": "History",
   "5": "Entertainment",
   "6": "Sports"
+  }
+}
+```
+
+---
+
+`GET '/api/v1.0/questions?page=${integer}'`
+
+- Fetches a paginated set of questions, a total number of questions, all categories and current category string.
+- Request Arguments: `page` - integer
+- Returns: An object with success flag, 10 paginated questions, total questions, object including all categories, and current category string
+
+```json
+{
+  "success": True,
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 2
+    }
+  ],
+  "total_questions": 100,
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "current_category": "History"
+}
+```
+
+---
+
+`GET '/api/v1.0/categories/${id}/questions'`
+
+- Fetches questions for a cateogry specified by id request argument
+- Request Arguments: `id` - integer
+- Returns: An object with success flag, questions for the specified category, total questions, and current category string
+
+```json
+{
+  "success": True,
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 4
+    }
+  ],
+  "total_questions": 100,
+  "current_category": "History"
+}
+```
+
+---
+
+`DELETE '/api/v1.0/questions/${id}'`
+
+- Deletes a specified question using the id of the question
+- Request Arguments: `id` - integer
+- Returns: An object with success flag, deleted question id, questions and total questions
+
+```json
+{
+  "success": True,
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 4
+    }
+  ],
+  "total_questions": 100,
+  "deleted": 5
+}
+```
+
+---
+
+`POST '/api/v1.0/quizzes'`
+
+- Sends a post request in order to get the next question
+- Request Body:
+
+```json
+{
+  "previous_questions": [1, 4, 20, 15],
+  "quiz_category": "current category"
+}
+```
+
+- Returns: a success flag and single new question object
+
+```json
+{
+  "success": True,
+  "question": {
+    "id": 1,
+    "question": "This is a question",
+    "answer": "This is an answer",
+    "difficulty": 5,
+    "category": 4
+  }
+}
+```
+
+---
+
+`POST '/api/v1.0/questions'`
+
+- Sends a post request in order to add a new question
+- Request Body:
+
+```json
+{
+  "question": "Heres a new question string",
+  "answer": "Heres a new answer string",
+  "difficulty": 1,
+  "category": 3
+}
+```
+
+- Returns: An object with success flag, created question id, questions and total questions
+
+```json
+{
+  "success": True,
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 4
+    }
+  ],
+  "total_questions": 100,
+  "created": 11
+}
+```
+
+---
+
+`POST '/api/v1.0/questions'`
+
+- Sends a post request in order to search for a specific question by search term
+- Request Body:
+
+```json
+{
+  "searchTerm": "this is the term the user is looking for"
+}
+```
+
+- Returns: success flag, any array of questions, a number of totalQuestions that met the search term and the current category string
+
+```json
+{
+  "success": True,
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 5
+    }
+  ],
+  "total_questions": 100,
+  "current_category": "Entertainment"
 }
 ```
 

@@ -73,13 +73,7 @@ def create_app(test_config=None):
             selection = Question.query.order_by(Question.id).all()
             current_questions = paginate_questions(request, selection)
 
-            return jsonify(
-                {
-                    "success": True,
-                    "deleted": question_id,
-                    "questions": current_questions,
-                    "total_questions": len(Question.query.all()),
-                })
+            return jsonify({ "success": True, "deleted": question_id, "questions": current_questions, "total_questions": len(Question.query.all()) })
 
         except:
             abort(422)        
@@ -92,9 +86,10 @@ def create_app(test_config=None):
             try:
                 search_term = body.get('searchTerm')
                 filtered_questions = Question.query.filter(Question.question.ilike('%' + search_term + '%')).all()
+                totalQuestions = len(filtered_questions)
+
                 categories = Category.query.all()
-                paginated_questions = paginate_questions(request, filtered_questions) 
-                totalQuestions = len(Question.query.all())
+                paginated_questions = paginate_questions(request, filtered_questions)                 
 
                 if len(paginated_questions) == 0:
                     abort(422)
@@ -117,14 +112,7 @@ def create_app(test_config=None):
                 selection = Question.query.order_by(Question.id).all()
                 current_questions = paginate_questions(request, selection)
 
-                return jsonify(
-                    {
-                        "success": True,
-                        "created": question.id,
-                        "questions": current_questions,
-                        "total_questions": len(Question.query.all())
-                    }
-                )
+                return jsonify({ "success": True, "created": question.id, "questions": current_questions, "total_questions": len(Question.query.all())})
 
             except:
                 abort(422)       
@@ -152,7 +140,7 @@ def create_app(test_config=None):
         return jsonify({ 'success': True, 'questions': paginated_questions, 'total_questions': totalQuestions, 'current_category' : currentCategory })
     
     @app.route('/quizzes', methods=['POST'])
-    def quiz():
+    def quizzes():
             body = request.get_json()
             previous_questions = body.get('previous_questions')
             quiz_category = body.get('quiz_category')
