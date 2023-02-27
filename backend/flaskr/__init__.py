@@ -146,41 +146,35 @@ def create_app(test_config=None):
             quiz_category = body.get('quiz_category')
             category_id = quiz_category['id']
 
-            category_ids = []
-            for id in db.session.query(Category.id).distinct().all():
-                category_ids.append(id)
-
             question_ids = []
-            for id in db.session.query(Question.id).distinct():
-                question_ids.append(id)
+            for question in Question.query.all():
+                if len(previous_questions) == 0:
+                    question_ids.append(question.id)
+                else:
+                    if question.id not in previous_questions:
+                        question_ids.append(question.id)
 
             filtered_question = {}
 
             # ALL
             if category_id == 0:
-                if len(previous_questions) == 0:
-                    question_id = random.choice(question_ids)                    
-                else:
-                    question_id = list(set(question_ids) - set(previous_questions)).pop()
-
-                filtered_question = Question.query.filter(Question.id == question_id).one_or_none() 
-                return jsonify({ 'success': True, 'question': filtered_question.format()  })
-
-            filtered_category = Category.query.filter(Category.id == category_id).one_or_none()
-            if filtered_category is None:
-                abort(400)
+                question_id = random.choice(question_ids)
             else:
-                if len(previous_questions) == 0:
-                    questions = Question.query.filter(Question.category == category_id).all()
-                    question_id = random.choice([question.id for question in questions])
-                    
+                filtered_category = Category.query.filter(Category.id == category_id).one_or_none()
+                if filtered_category is None:
+                    abort(400)
                 else:
-                    questions = list(set(question_ids) - set(previous_questions))
-                    filtered_questions = Question.query.filter(Question.id == category_id).filter(Question.id in questions)
-                    question_id = random.choice([question.id for question in filtered_questions])
+                    questions = Question.query.filter(Question.category == category_id).all()
+                    category_question_ids = [question.id for question in questions]
+                    valid_questions = list(set(question_ids) & set(category_question_ids))
+                    if len(valid_questions) > 0:
+                        question_id = random.choice(valid_questions)
+                    else:
+                        question_id = 0
+            
+            filtered_question = Question.query.filter(Question.id == question_id).one_or_none() 
+            return jsonify({ 'success': True, 'question': None if filtered_question is None else filtered_question.format()  })
 
-                filtered_question = Question.query.filter(Question.id == question_id).first()
-                return jsonify({ 'success': True, 'question': filtered_question.format()  })
 
     # ERROR HANDLING
     @app.errorhandler(400)
